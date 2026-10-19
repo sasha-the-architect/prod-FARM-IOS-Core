@@ -1,0 +1,13 @@
+{
+  "create": {"x": 405, "y": 1050, "match": "Create"},
+  "upload": {"x": 405, "y": 500, "match": "recordPageUploadButton"},
+  "select_multiple": {"x": 140, "y": 1040, "match": "Select multiple"},
+  "thumb_centers": [
+    {"x": 166, "y": 320}, {"x": 500, "y": 320}, {"x": 834, "y": 320},
+    {"x": 166, "y": 560}, {"x": 500, "y": 560}, {"x": 834, "y": 560}
+  ],
+  "editor_text": {"x": 784, "y": 205},
+  "editor_next": {"x": 603, "y": 1050},
+  "post": {"x": 603, "y": 1040},
+  "dismiss_contacts": {"x": 200, "y": 700, "match": "Don't allow"}
+}

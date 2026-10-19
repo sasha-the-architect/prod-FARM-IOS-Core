@@ -4,6 +4,7 @@ dist/
 .env.*
 !.env.example
 devices.json
+.appium2/
 .wda/
 .scheduler-data/
 static/assets/

@@ -1,0 +1,34 @@
+{
+  "like": {
+    "x": 360,
+    "y": 2200
+  },
+  "follow": {
+    "x": 1700,
+    "y": 260
+  },
+  "comment_field": {
+    "x": 300,
+    "y": 2300
+  },
+  "comment_post": {
+    "x": 1900,
+    "y": 2300
+  },
+  "open_studio": {
+    "x": 1920,
+    "y": 220
+  },
+  "studio_upload": {
+    "x": 320,
+    "y": 640
+  },
+  "profile_tab": {
+    "x": 1500,
+    "y": 2550
+  },
+  "account_switcher": {
+    "x": 960,
+    "y": 320
+  }
+}
