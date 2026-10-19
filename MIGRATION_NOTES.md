@@ -28,7 +28,7 @@ devices, with a plugin architecture:
 
 | Item | Source (legacy) | Destination (new) |
 | --- | --- | --- |
-| Device UDID `3a12427b53754c2e9cbaad9ca8d41318f562bfb3` (iPhone-Spare-01) | `config/devices.json` | `devices.json` (0600, git-ignored), `coordinateProfile: iphone8` |
+| Device registry | `config/devices.json` (spare SE1, iOS 15) | `devices.json` (0600, git-ignored) — final registry: **iPhone sash** `00008101-001670AA3669001E` (iOS 26.7.1) + `coordinateProfile: iphone8` |
 | Apple Development Team ID `M4TFAR3S8T` | `scripts/renew_wda.sh` | `.env` `XCODE_ORG_ID` |
 | WDA bundle id `com.sashapaskal.wda.xctrunner.xctrunner` | `scripts/renew_wda.sh` | `.env` `WDA_BUNDLE_ID` |
 | TikTok bundle id | hardcoded | `.env` `TIKTOK_BUNDLE_ID=com.zhiliaoapp.musically` (unchanged) |
@@ -48,19 +48,39 @@ devices, with a plugin architecture:
 
 ## Known gaps / follow-ups
 
-1. **iOS 15 device**: iPhone-Spare-01 runs iOS 15.8.8. The legacy stack drove it
-   via VoiceControl because Xcode 26 cannot launch WDA on iOS 15. Phone Farm iOS
-   has no VoiceControl path — it requires iOS 16+ (Developer Mode + WDA). This
-   device needs an OS upgrade or a replacement iPhone before automation works on it.
-2. **TikTok accounts**: the legacy repo had no committed account credentials file.
+1. **Device inventory (2026-10-19, via `xcrun xctrace list devices`)**: the actual
+   hardware is **iPhone sash** (`00008101-001670AA3669001E`, iOS 26.7.1 — now the
+   registered device) and an **iPad** (`00008020-000525E23C45402E`, iOS 26.7.1,
+   not yet registered). The legacy spare SE1 (`3a12427b…`, iOS 15.8.8) is
+   **permanently incompatible** — SE1 hardware is capped at iOS 15 and Phone Farm
+   requires iOS 16+; it stays retired with the legacy tree (VoiceControl path).
+2. **Coordinate profile gap for iPhone sash**: the only shipped tap layout is
+   `iphone8` (375×667). A modern iPhone has a different geometry, and dashboard
+   "Touch points" overrides are bounds-checked against the *profile's* screen
+   size — so a taller screen cannot be fully calibrated per-device. Doomscroll
+   is largely unaffected (like/save are template-matched on the live screen at
+   runtime and the feed swipe is geometry-tolerant); **post** and
+   **account-switch** need a proper profile for the exact model. Plan: once the
+   phone is USB-attached and WDA is up, read `productType` + screen size, measure
+   every target off the live screen (`GET /api/devices/:udid/remote/screenshot`),
+   verify with test taps, then add the profile to `src/devices/coordinates.ts` +
+   `src/tiktok/coordinates.ts` (docs/coordinates.md workflow).
+3. **TikTok accounts**: the legacy repo had no committed account credentials file.
    Register handles per device in the dashboard (device page → TikTok panel) or
-   `PATCH /api/devices/:udid/accounts`.
-3. **Device passcode**: not carried over. Set it in the dashboard registration
+   `PATCH /api/devices/:udid/accounts`. Accounts must already be logged in to
+   the TikTok app on the phone — the plugin switches between logged-in sessions.
+4. **Device passcode**: not carried over. Set it in the dashboard registration
    wizard or `PATCH /api/devices/:udid` (`{"passcode":"…"}`) so scheduled tasks
    can unlock the phone.
-4. **WDA signing**: run `npm run wda:prepare` from a graphical Terminal session
+5. **WDA signing**: run `npm run wda:prepare` from a graphical Terminal session
    (keychain must be unlocked) with the phone plugged in; it patches and signs
    the Appium-bundled WebDriverAgent with team `M4TFAR3S8T`.
+   `xcode-select -p` verified → `/Applications/Xcode.app/Contents/Developer`.
+6. **Legacy launchd agents retired (2026-10-19)**: `com.sashapaskal.farm-worker`
+   (old Python uvicorn, was crash-looping on :5002) and
+   `com.sashapaskal.wda-supervisor` (was polling for the unplugged iPad) were
+   unloaded and their plists removed from `~/Library/LaunchAgents`. Ports
+   3000/4725/5002/8100/9100 verified free.
 
 ## Verified working (2026-10-19)
 
